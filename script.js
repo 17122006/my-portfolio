@@ -1,31 +1,28 @@
-
 /* =========================================================
    PERSONAL INFORMATION
-   ONLY EDIT THIS SECTION
+   EDIT ONLY THIS SECTION
 ========================================================= */
 
 const portfolioData = {
-
   name: "thrishna",
 
-  title:
-    "B.E. Computer Science Engineering Student | Developer",
+  title: "B.E. Computer Science Engineering Student | Developer",
 
-  email:
-    "your@email.com",
+  email: "thrishnapoojary1@email.com",
 
-  github:
-    "YOUR_GITHUB_USERNAME",
+  // IMPORTANT:
+  // Put ONLY your GitHub username here.
+  // Example: "thrishna123"
+  github: "YOUR_GITHUB_USERNAME",
 
-  linkedin:
-    "https://www.linkedin.com/in/YOUR_USERNAME/",
+  // Put your complete LinkedIn profile URL here.
+  linkedin: "https://www.linkedin.com/in/YOUR_USERNAME/",
 
   bio:
     "I am a Computer Science Engineering student passionate about technology, software development and building practical digital solutions.",
 
   about:
     "I am a Computer Science Engineering student who enjoys learning how technology works and using that knowledge to build practical digital experiences. I am especially interested in web development, software development and AI/ML."
-
 };
 
 
@@ -34,7 +31,6 @@ const portfolioData = {
 ========================================================= */
 
 const starterSkills = [
-
   {
     id: "html",
     name: "HTML",
@@ -42,7 +38,6 @@ const starterSkills = [
     level: "",
     icon: "<>"
   },
-
   {
     id: "css",
     name: "CSS",
@@ -50,7 +45,6 @@ const starterSkills = [
     level: "",
     icon: "{}"
   },
-
   {
     id: "javascript",
     name: "JavaScript",
@@ -58,7 +52,6 @@ const starterSkills = [
     level: "",
     icon: "JS"
   },
-
   {
     id: "python",
     name: "Python",
@@ -66,7 +59,6 @@ const starterSkills = [
     level: "",
     icon: "Py"
   },
-
   {
     id: "c",
     name: "C",
@@ -74,7 +66,6 @@ const starterSkills = [
     level: "",
     icon: "C"
   },
-
   {
     id: "java",
     name: "Java",
@@ -82,7 +73,6 @@ const starterSkills = [
     level: "",
     icon: "J"
   },
-
   {
     id: "sql",
     name: "SQL",
@@ -90,7 +80,6 @@ const starterSkills = [
     level: "",
     icon: "DB"
   },
-
   {
     id: "git",
     name: "Git",
@@ -98,7 +87,6 @@ const starterSkills = [
     level: "",
     icon: "Git"
   },
-
   {
     id: "github",
     name: "GitHub",
@@ -106,7 +94,6 @@ const starterSkills = [
     level: "",
     icon: "GH"
   },
-
   {
     id: "aiml",
     name: "AI / ML",
@@ -114,7 +101,6 @@ const starterSkills = [
     level: "",
     icon: "AI"
   }
-
 ];
 
 
@@ -134,7 +120,6 @@ const $$ = (selector, parent = document) =>
 ========================================================= */
 
 let skills = loadSkills();
-
 let currentSkillCategory = "All";
 
 
@@ -142,34 +127,21 @@ let currentSkillCategory = "All";
    INITIALIZATION
 ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  initializeApp
-);
-
+document.addEventListener("DOMContentLoaded", initializeApp);
 
 async function initializeApp() {
-
   initializePersonalData();
-
   initializeLoader();
-
   initializeNavigation();
-
   initializeScrollAnimations();
-
   initializeSkills();
 
   await initializeCertificates();
-
   await initializeGithub();
 
   initializeContact();
-
   initializeModals();
-
   initializeProjectButtons();
-
 }
 
 
@@ -178,137 +150,110 @@ async function initializeApp() {
 ========================================================= */
 
 function initializePersonalData() {
-
   document.title =
     `${portfolioData.name} | Developer Portfolio`;
-
 
   const heroBio = $("#heroBio");
 
   if (heroBio) {
-    heroBio.textContent =
-      portfolioData.bio;
+    heroBio.textContent = portfolioData.bio;
   }
-
 
   const aboutBio = $("#aboutBio");
 
   if (aboutBio) {
-    aboutBio.textContent =
-      portfolioData.about;
+    aboutBio.textContent = portfolioData.about;
   }
 
+  /* LinkedIn */
 
-  const linkedinName =
-    $("#linkedinName");
+  const linkedinName = $("#linkedinName");
 
   if (linkedinName) {
-    linkedinName.textContent =
-      portfolioData.name;
+    linkedinName.textContent = portfolioData.name;
   }
 
-
-  const linkedinHeadline =
-    $("#linkedinHeadline");
+  const linkedinHeadline = $("#linkedinHeadline");
 
   if (linkedinHeadline) {
-    linkedinHeadline.textContent =
-      portfolioData.title;
+    linkedinHeadline.textContent = portfolioData.title;
   }
 
+  /* Email */
 
-  const emailLink =
-    $("#emailLink");
+  const emailLink = $("#emailLink");
 
   if (emailLink) {
-
     emailLink.textContent =
       `${portfolioData.email} ↗`;
 
     emailLink.href =
       `mailto:${portfolioData.email}`;
-
   }
 
+  /* GitHub */
 
   const githubReady =
     portfolioData.github &&
     !portfolioData.github.includes("YOUR_");
-
-
-  const linkedinReady =
-    portfolioData.linkedin &&
-    !portfolioData.linkedin.includes("YOUR_");
-
 
   const githubUrl =
     githubReady
       ? `https://github.com/${portfolioData.github}`
       : "#";
 
-
   [
     "#heroGithub",
     "#contactGithub",
     "#githubProfileLink"
   ].forEach(selector => {
-
     const element = $(selector);
 
-    if (!element) {
-      return;
+    if (!element) return;
+
+    element.href = githubUrl;
+
+    if (!githubReady) {
+      element.addEventListener("click", event => {
+        event.preventDefault();
+
+        showToast(
+          "Add your GitHub username in script.js."
+        );
+      });
     }
-
-    element.href =
-      githubUrl;
-
   });
 
+  /* LinkedIn */
+
+  const linkedinReady =
+    portfolioData.linkedin &&
+    !portfolioData.linkedin.includes("YOUR_");
 
   [
     "#heroLinkedin",
     "#contactLinkedin",
     "#linkedinButton"
   ].forEach(selector => {
-
     const element = $(selector);
 
-    if (!element) {
-      return;
-    }
+    if (!element) return;
 
     element.href =
       linkedinReady
         ? safeUrl(portfolioData.linkedin)
         : "#";
 
-  });
+    if (!linkedinReady) {
+      element.addEventListener("click", event => {
+        event.preventDefault();
 
-
-  if (!linkedinReady) {
-
-    const linkedinButton =
-      $("#linkedinButton");
-
-    if (linkedinButton) {
-
-      linkedinButton.addEventListener(
-        "click",
-        event => {
-
-          event.preventDefault();
-
-          showToast(
-            "Add your LinkedIn URL in script.js."
-          );
-
-        }
-      );
-
+        showToast(
+          "Add your LinkedIn URL in script.js."
+        );
+      });
     }
-
-  }
-
+  });
 }
 
 
@@ -317,40 +262,28 @@ function initializePersonalData() {
 ========================================================= */
 
 function initializeProfileImage() {
+  const image = $("#profileImage");
 
-  const image =
-    $("#profileImage");
-
-  if (!image) {
-    return;
-  }
+  if (!image) return;
 
   image.addEventListener(
     "error",
     handleProfileError
   );
-
 }
 
 
 function handleProfileError() {
-
-  const image =
-    $("#profileImage");
-
-  const fallback =
-    $("#profileFallback");
-
+  const image = $("#profileImage");
+  const fallback = $("#profileFallback");
 
   if (image) {
     image.style.display = "none";
   }
 
-
   if (fallback) {
     fallback.style.display = "grid";
   }
-
 }
 
 
@@ -359,34 +292,21 @@ function handleProfileError() {
 ========================================================= */
 
 function initializeLoader() {
-
   initializeProfileImage();
-
 
   window.addEventListener(
     "load",
     () => {
+      setTimeout(() => {
+        const loader = $("#loader");
 
-      setTimeout(
-        () => {
-
-          const loader =
-            $("#loader");
-
-          if (loader) {
-            loader.classList.add("hide");
-          }
-
-        },
-        450
-      );
-
+        if (loader) {
+          loader.classList.add("hide");
+        }
+      }, 450);
     },
-    {
-      once: true
-    }
+    { once: true }
   );
-
 }
 
 
@@ -395,53 +315,35 @@ function initializeLoader() {
 ========================================================= */
 
 function initializeNavigation() {
-
-  const header =
-    $("#header");
-
-  const menuButton =
-    $("#menuButton");
-
-  const navLinks =
-    $("#navLinks");
-
+  const header = $("#header");
+  const menuButton = $("#menuButton");
+  const navLinks = $("#navLinks");
 
   if (!header || !menuButton || !navLinks) {
     return;
   }
 
-
   window.addEventListener(
     "scroll",
     () => {
-
       header.classList.toggle(
         "scrolled",
         window.scrollY > 15
       );
-
     },
-    {
-      passive: true
-    }
+    { passive: true }
   );
-
 
   menuButton.addEventListener(
     "click",
     () => {
-
       const isOpen =
-        navLinks.classList.toggle(
-          "open"
-        );
-
+        navLinks.classList.toggle("open");
 
       menuButton.setAttribute(
         "aria-expanded",
         String(isOpen)
       );
-
 
       menuButton.setAttribute(
         "aria-label",
@@ -449,93 +351,56 @@ function initializeNavigation() {
           ? "Close navigation"
           : "Open navigation"
       );
-
     }
   );
 
+  $$(".nav-link").forEach(link => {
+    link.addEventListener(
+      "click",
+      () => {
+        navLinks.classList.remove("open");
 
-  $$(".nav-link").forEach(
-    link => {
+        menuButton.setAttribute(
+          "aria-expanded",
+          "false"
+        );
 
-      link.addEventListener(
-        "click",
-        () => {
+        menuButton.setAttribute(
+          "aria-label",
+          "Open navigation"
+        );
+      }
+    );
+  });
 
-          navLinks.classList.remove(
-            "open"
-          );
+  const sections = $$("main section[id]");
+  const navigationLinks = $$(".nav-link");
 
-          menuButton.setAttribute(
-            "aria-expanded",
-            "false"
-          );
-
-          menuButton.setAttribute(
-            "aria-label",
-            "Open navigation"
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-  const sections =
-    $$("main section[id]");
-
-
-  const navigationLinks =
-    $$(".nav-link");
-
-
-  if (!sections.length) {
-    return;
-  }
-
+  if (!sections.length) return;
 
   const observer =
     new IntersectionObserver(
       entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
 
-        entries.forEach(
-          entry => {
-
-            if (!entry.isIntersecting) {
-              return;
-            }
-
-
-            navigationLinks.forEach(
-              link => {
-
-                link.classList.toggle(
-                  "active",
-
-                  link.getAttribute("href") ===
-                  `#${entry.target.id}`
-                );
-
-              }
+          navigationLinks.forEach(link => {
+            link.classList.toggle(
+              "active",
+              link.getAttribute("href") ===
+                `#${entry.target.id}`
             );
-
-          }
-        );
-
+          });
+        });
       },
       {
-        rootMargin:
-          "-35% 0px -55% 0px"
+        rootMargin: "-35% 0px -55% 0px"
       }
     );
 
-
-  sections.forEach(
-    section =>
-      observer.observe(section)
+  sections.forEach(section =>
+    observer.observe(section)
   );
-
 }
 
 
@@ -544,68 +409,43 @@ function initializeNavigation() {
 ========================================================= */
 
 function initializeScrollAnimations() {
+  const elements = $$(".reveal");
 
-  const elements =
-    $$(".reveal");
-
-
-  if (!elements.length) {
-    return;
-  }
-
+  if (!elements.length) return;
 
   if (
     window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches
   ) {
-
-    elements.forEach(
-      element =>
-        element.classList.add("visible")
+    elements.forEach(element =>
+      element.classList.add("visible")
     );
 
     return;
-
   }
-
 
   const observer =
     new IntersectionObserver(
       entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
 
-        entries.forEach(
-          entry => {
+          entry.target.classList.add(
+            "visible"
+          );
 
-            if (!entry.isIntersecting) {
-              return;
-            }
-
-
-            entry.target.classList.add(
-              "visible"
-            );
-
-
-            observer.unobserve(
-              entry.target
-            );
-
-          }
-        );
-
+          observer.unobserve(entry.target);
+        });
       },
       {
         threshold: 0.08
       }
     );
 
-
-  elements.forEach(
-    element =>
-      observer.observe(element)
+  elements.forEach(element =>
+    observer.observe(element)
   );
-
 }
 
 
@@ -614,163 +454,113 @@ function initializeScrollAnimations() {
 ========================================================= */
 
 function loadSkills() {
-
   try {
-
     const saved =
       localStorage.getItem(
         "portfolioSkills"
       );
 
-
     if (!saved) {
       return [...starterSkills];
     }
 
-
-    const parsed =
-      JSON.parse(saved);
-
+    const parsed = JSON.parse(saved);
 
     if (!Array.isArray(parsed)) {
       return [...starterSkills];
     }
 
-
     return parsed;
-
   } catch (error) {
-
     console.error(
       "Could not load skills:",
       error
     );
 
     return [...starterSkills];
-
   }
-
 }
 
 
 function initializeSkills() {
-
   renderSkills();
 
-
-  const addButton =
-    $("#addSkillButton");
+  const addButton = $("#addSkillButton");
 
   if (addButton) {
-
     addButton.addEventListener(
       "click",
       () => openSkillModal()
     );
-
   }
 
+  $$("#skillFilters .filter").forEach(
+    filter => {
+      filter.addEventListener(
+        "click",
+        () => {
+          $$("#skillFilters .filter").forEach(
+            button =>
+              button.classList.remove(
+                "active"
+              )
+          );
 
-  $$("#skillFilters .filter")
-    .forEach(
-      filter => {
+          filter.classList.add("active");
 
-        filter.addEventListener(
-          "click",
-          () => {
+          currentSkillCategory =
+            filter.dataset.category;
 
-            $$("#skillFilters .filter")
-              .forEach(
-                button =>
-                  button.classList.remove(
-                    "active"
-                  )
-              );
+          renderSkills();
+        }
+      );
+    }
+  );
 
-
-            filter.classList.add(
-              "active"
-            );
-
-
-            currentSkillCategory =
-              filter.dataset.category;
-
-
-            renderSkills();
-
-          }
-        );
-
-      }
-    );
-
-
-  const form =
-    $("#skillForm");
+  const form = $("#skillForm");
 
   if (form) {
-
     form.addEventListener(
       "submit",
       saveSkill
     );
-
   }
-
 }
 
 
 function renderSkills() {
+  const grid = $("#skillsGrid");
 
-  const grid =
-    $("#skillsGrid");
-
-
-  if (!grid) {
-    return;
-  }
-
+  if (!grid) return;
 
   const visibleSkills =
     skills.filter(
       skill =>
         currentSkillCategory === "All" ||
         skill.category ===
-        currentSkillCategory
+          currentSkillCategory
     );
 
-
   if (!visibleSkills.length) {
-
     grid.innerHTML = `
       <div class="empty-state">
+        <div class="empty-state-icon">✦</div>
 
-        <div class="empty-state-icon">
-          ✦
-        </div>
-
-        <h3>
-          No skills in this category
-        </h3>
+        <h3>No skills in this category</h3>
 
         <p>
           Add a skill using the button above.
         </p>
-
       </div>
     `;
 
     return;
-
   }
-
 
   grid.innerHTML =
     visibleSkills
       .map(
         skill => `
-
           <article
             class="skill-card"
             tabindex="0"
@@ -818,76 +608,47 @@ function renderSkills() {
             </p>
 
           </article>
-
         `
       )
       .join("");
 
+  $$("[data-edit-skill]").forEach(
+    button => {
+      button.addEventListener(
+        "click",
+        () =>
+          openSkillModal(
+            button.dataset.editSkill
+          )
+      );
+    }
+  );
 
-  $$("[data-edit-skill]")
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            openSkillModal(
-              button.dataset.editSkill
-            )
-        );
-
-      }
-    );
-
-
-  $$("[data-delete-skill]")
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            deleteSkill(
-              button.dataset.deleteSkill
-            )
-        );
-
-      }
-    );
-
+  $$("[data-delete-skill]").forEach(
+    button => {
+      button.addEventListener(
+        "click",
+        () =>
+          deleteSkill(
+            button.dataset.deleteSkill
+          )
+      );
+    }
+  );
 }
 
 
 function openSkillModal(id = "") {
-
   const skill =
-    skills.find(
-      item =>
-        item.id === id
-    );
+    skills.find(item => item.id === id);
 
-
-  const skillId =
-    $("#skillId");
-
-  const title =
-    $("#skillModalTitle");
-
-  const name =
-    $("#skillName");
-
-  const category =
-    $("#skillCategory");
-
-  const level =
-    $("#skillLevel");
-
-  const icon =
-    $("#skillIcon");
-
-  const modal =
-    $("#skillModal");
-
+  const skillId = $("#skillId");
+  const title = $("#skillModalTitle");
+  const name = $("#skillName");
+  const category = $("#skillCategory");
+  const level = $("#skillLevel");
+  const icon = $("#skillIcon");
+  const modal = $("#skillModal");
 
   if (
     !skillId ||
@@ -901,116 +662,83 @@ function openSkillModal(id = "") {
     return;
   }
 
-
-  skillId.value =
-    skill?.id || "";
+  skillId.value = skill?.id || "";
 
   title.textContent =
     skill
       ? "Edit skill"
       : "Add a skill";
 
-  name.value =
-    skill?.name || "";
+  name.value = skill?.name || "";
 
   category.value =
     skill?.category ||
     "Programming Languages";
 
-  level.value =
-    skill?.level || "";
+  level.value = skill?.level || "";
+  icon.value = skill?.icon || "";
 
-  icon.value =
-    skill?.icon || "";
-
-
-  if (typeof modal.showModal === "function") {
+  if (
+    typeof modal.showModal ===
+    "function"
+  ) {
     modal.showModal();
   } else {
     modal.setAttribute("open", "");
   }
 
-
   setTimeout(
     () => name.focus(),
     50
   );
-
 }
 
 
 function saveSkill(event) {
-
   event.preventDefault();
 
-
   const name =
-    $("#skillName")
-      ?.value
-      .trim();
-
+    $("#skillName")?.value.trim();
 
   if (!name) {
-
     showToast(
       "Please enter a skill name."
     );
 
     return;
-
   }
 
-
   const id =
-    $("#skillId")
-      ?.value ||
+    $("#skillId")?.value ||
     createId();
 
-
   const skill = {
-
     id,
-
     name,
 
     category:
-      $("#skillCategory")
-        ?.value ||
+      $("#skillCategory")?.value ||
       "Other",
 
     level:
-      $("#skillLevel")
-        ?.value
-        .trim() ||
+      $("#skillLevel")?.value.trim() ||
       "",
 
     icon:
-      $("#skillIcon")
-        ?.value
-        .trim() ||
+      $("#skillIcon")?.value.trim() ||
       "•"
-
   };
-
 
   const existingIndex =
     skills.findIndex(
-      item =>
-        item.id === id
+      item => item.id === id
     );
 
-
   if (existingIndex >= 0) {
-
-    skills[existingIndex] =
-      skill;
-
+    skills[existingIndex] = skill;
   } else {
-
     skills.push(skill);
-
   }
-
 
   saveSkills();
 
@@ -1018,70 +746,49 @@ function saveSkill(event) {
 
   renderSkills();
 
-
   showToast(
     existingIndex >= 0
       ? "Skill updated successfully."
       : "Skill added successfully."
   );
-
 }
 
 
 function deleteSkill(id) {
-
   const skill =
     skills.find(
-      item =>
-        item.id === id
+      item => item.id === id
     );
 
-
-  if (!skill) {
-    return;
-  }
-
+  if (!skill) return;
 
   const confirmed =
     window.confirm(
       `Delete "${skill.name}"?`
     );
 
-
-  if (!confirmed) {
-    return;
-  }
-
+  if (!confirmed) return;
 
   skills =
     skills.filter(
-      item =>
-        item.id !== id
+      item => item.id !== id
     );
-
 
   saveSkills();
 
   renderSkills();
 
-  showToast(
-    "Skill deleted."
-  );
-
+  showToast("Skill deleted.");
 }
 
 
 function saveSkills() {
-
   try {
-
     localStorage.setItem(
       "portfolioSkills",
       JSON.stringify(skills)
     );
-
   } catch (error) {
-
     console.error(
       "Could not save skills:",
       error
@@ -1090,9 +797,7 @@ function saveSkills() {
     showToast(
       "Could not save skills in this browser."
     );
-
   }
-
 }
 
 
@@ -1112,21 +817,15 @@ const CERTIFICATE_STORE =
 let databasePromise = null;
 
 
-/* Open database */
-
 function openDatabase() {
-
   if (databasePromise) {
     return databasePromise;
   }
 
-
   databasePromise =
     new Promise(
       (resolve, reject) => {
-
         if (!("indexedDB" in window)) {
-
           reject(
             new Error(
               "IndexedDB is not supported."
@@ -1134,9 +833,7 @@ function openDatabase() {
           );
 
           return;
-
         }
-
 
         const request =
           indexedDB.open(
@@ -1144,74 +841,55 @@ function openDatabase() {
             DATABASE_VERSION
           );
 
-
         request.onupgradeneeded =
           event => {
-
             const database =
               event.target.result;
-
 
             if (
               !database.objectStoreNames.contains(
                 CERTIFICATE_STORE
               )
             ) {
-
               database.createObjectStore(
                 CERTIFICATE_STORE,
                 {
                   keyPath: "id"
                 }
               );
-
             }
-
           };
-
 
         request.onsuccess =
           () =>
-            resolve(
-              request.result
-            );
-
+            resolve(request.result);
 
         request.onerror =
           () =>
             reject(
               request.error ||
-              new Error(
-                "Could not open database."
-              )
+                new Error(
+                  "Could not open database."
+                )
             );
-
       }
     );
 
-
   return databasePromise;
-
 }
 
 
-/* Get certificates */
-
 async function getCertificates() {
-
   const database =
     await openDatabase();
 
-
   return new Promise(
     (resolve, reject) => {
-
       const transaction =
         database.transaction(
           CERTIFICATE_STORE,
           "readonly"
         );
-
 
       const request =
         transaction
@@ -1220,45 +898,35 @@ async function getCertificates() {
           )
           .getAll();
 
-
       request.onsuccess =
         () =>
           resolve(
             request.result || []
           );
 
-
       request.onerror =
         () =>
           reject(
             request.error
           );
-
     }
   );
-
 }
 
-
-/* Save certificate */
 
 async function saveCertificate(
   certificate
 ) {
-
   const database =
     await openDatabase();
 
-
   return new Promise(
     (resolve, reject) => {
-
       const transaction =
         database.transaction(
           CERTIFICATE_STORE,
           "readwrite"
         );
-
 
       const request =
         transaction
@@ -1267,43 +935,30 @@ async function saveCertificate(
           )
           .put(certificate);
 
-
       request.onsuccess =
-        () =>
-          resolve();
-
+        () => resolve();
 
       request.onerror =
         () =>
           reject(
             request.error
           );
-
     }
   );
-
 }
 
 
-/* Delete certificate */
-
-async function deleteCertificate(
-  id
-) {
-
+async function deleteCertificate(id) {
   const database =
     await openDatabase();
 
-
   return new Promise(
     (resolve, reject) => {
-
       const transaction =
         database.transaction(
           CERTIFICATE_STORE,
           "readwrite"
         );
-
 
       const request =
         transaction
@@ -1312,106 +967,72 @@ async function deleteCertificate(
           )
           .delete(id);
 
-
       request.onsuccess =
-        () =>
-          resolve();
-
+        () => resolve();
 
       request.onerror =
         () =>
           reject(
             request.error
           );
-
     }
   );
-
 }
 
 
-/* Initialize certificates */
-
 async function initializeCertificates() {
-
   const addButton =
     $("#addCertificateButton");
 
   const form =
     $("#certificateForm");
 
-
   if (addButton) {
-
     addButton.addEventListener(
       "click",
       () => {
-
         const modal =
           $("#certificateModal");
 
-        if (!modal) {
-          return;
-        }
+        if (!modal) return;
 
         if (
           typeof modal.showModal ===
           "function"
         ) {
-
           modal.showModal();
-
         } else {
-
           modal.setAttribute(
             "open",
             ""
           );
-
         }
-
       }
     );
-
   }
 
-
   if (form) {
-
     form.addEventListener(
       "submit",
       addCertificate
     );
-
   }
 
-
   await renderCertificates();
-
 }
 
 
-/* Render certificates */
-
 async function renderCertificates() {
-
   const grid =
     $("#certificateGrid");
 
-
-  if (!grid) {
-    return;
-  }
-
+  if (!grid) return;
 
   try {
-
     const certificates =
       await getCertificates();
 
-
     if (!certificates.length) {
-
       grid.innerHTML = `
         <div class="empty-state">
 
@@ -1432,18 +1053,14 @@ async function renderCertificates() {
       `;
 
       return;
-
     }
-
 
     certificates.sort(
       (a, b) =>
-        (b.date || "")
-          .localeCompare(
-            a.date || ""
-          )
+        (b.date || "").localeCompare(
+          a.date || ""
+        )
     );
-
 
     grid.innerHTML =
       certificates
@@ -1455,107 +1072,76 @@ async function renderCertificates() {
         )
         .join("");
 
-
     $$("[data-preview-certificate]")
-      .forEach(
-        element => {
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          () =>
+            previewCertificate(
+              element.dataset
+                .previewCertificate
+            )
+        );
 
-          element.addEventListener(
-            "click",
-            () =>
+        element.addEventListener(
+          "keydown",
+          event => {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
+              event.preventDefault();
+
               previewCertificate(
                 element.dataset
                   .previewCertificate
-              )
-          );
-
-
-          element.addEventListener(
-            "keydown",
-            event => {
-
-              if (
-                event.key === "Enter" ||
-                event.key === " "
-              ) {
-
-                event.preventDefault();
-
-                previewCertificate(
-                  element.dataset
-                    .previewCertificate
-                );
-
-              }
-
+              );
             }
-          );
-
-        }
-      );
-
+          }
+        );
+      });
 
     $$("[data-delete-certificate]")
-      .forEach(
-        button => {
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          async event => {
+            event.stopPropagation();
 
-          button.addEventListener(
-            "click",
-            async event => {
+            const id =
+              button.dataset
+                .deleteCertificate;
 
-              event.stopPropagation();
+            const confirmed =
+              window.confirm(
+                "Delete this certificate?"
+              );
 
+            if (!confirmed) return;
 
-              const id =
-                button.dataset
-                  .deleteCertificate;
+            try {
+              await deleteCertificate(id);
 
+              await renderCertificates();
 
-              const confirmed =
-                window.confirm(
-                  "Delete this certificate?"
-                );
+              showToast(
+                "Certificate deleted."
+              );
+            } catch (error) {
+              console.error(error);
 
-
-              if (!confirmed) {
-                return;
-              }
-
-
-              try {
-
-                await deleteCertificate(id);
-
-                await renderCertificates();
-
-                showToast(
-                  "Certificate deleted."
-                );
-
-              } catch (error) {
-
-                console.error(error);
-
-                showToast(
-                  "Could not delete certificate."
-                );
-
-              }
-
+              showToast(
+                "Could not delete certificate."
+              );
             }
-          );
-
-        }
-      );
-
-
+          }
+        );
+      });
   } catch (error) {
-
     console.error(
       "Certificate storage error:",
       error
     );
-
 
     grid.innerHTML = `
       <div class="empty-state">
@@ -1574,29 +1160,21 @@ async function renderCertificates() {
 
       </div>
     `;
-
   }
-
 }
 
-
-/* Create certificate card */
 
 function createCertificateCard(
   certificate
 ) {
-
   const type =
     certificate.type || "";
-
 
   const isImage =
     type.startsWith("image/");
 
-
   const preview =
     isImage
-
       ? `
         <img
           src="${escapeAttribute(
@@ -1608,13 +1186,11 @@ function createCertificateCard(
           loading="lazy"
         >
       `
-
       : `
         <div class="pdf-preview">
           PDF
         </div>
       `;
-
 
   return `
     <article class="certificate-card">
@@ -1635,7 +1211,6 @@ function createCertificateCard(
 
       </div>
 
-
       <div class="certificate-info">
 
         <h3>
@@ -1650,11 +1225,9 @@ function createCertificateCard(
           )}
         </p>
 
-
         <div class="certificate-bottom">
 
           <span class="certificate-date">
-
             ${
               certificate.date
                 ? formatDate(
@@ -1662,9 +1235,7 @@ function createCertificateCard(
                   )
                 : "Date not added"
             }
-
           </span>
-
 
           <div class="certificate-actions">
 
@@ -1673,7 +1244,6 @@ function createCertificateCard(
               safeUrl(
                 certificate.link
               ) !== "#"
-
                 ? `
                   <a
                     href="${safeUrl(
@@ -1690,7 +1260,6 @@ function createCertificateCard(
                 `
                 : ""
             }
-
 
             <button
               type="button"
@@ -1712,145 +1281,101 @@ function createCertificateCard(
 
     </article>
   `;
-
 }
 
 
-/* Add certificate */
-
 async function addCertificate(event) {
-
   event.preventDefault();
-
 
   const fileInput =
     $("#certificateFile");
 
-
   const file =
     fileInput?.files?.[0];
 
-
   if (!file) {
-
     showToast(
       "Please select a certificate."
     );
 
     return;
-
   }
-
 
   const maximumSize =
     8 * 1024 * 1024;
 
-
   if (file.size > maximumSize) {
-
     showToast(
       "Certificate must be smaller than 8 MB."
     );
 
     return;
-
   }
-
 
   const validFile =
     file.type.startsWith("image/") ||
     file.type === "application/pdf";
 
-
   if (!validFile) {
-
     showToast(
       "Please select an image or PDF."
     );
 
     return;
-
   }
-
 
   const name =
     $("#certificateName")
-      ?.value
-      .trim();
-
+      ?.value.trim();
 
   const organization =
     $("#certificateOrganization")
-      ?.value
-      .trim();
-
+      ?.value.trim();
 
   if (!name || !organization) {
-
     showToast(
       "Please fill the required fields."
     );
 
     return;
-
   }
-
 
   const link =
     $("#certificateLink")
-      ?.value
-      .trim() ||
-    "";
-
+      ?.value.trim() || "";
 
   if (
     link &&
     safeUrl(link) === "#"
   ) {
-
     showToast(
       "Please enter a valid certificate URL."
     );
 
     return;
-
   }
 
-
   try {
-
     const data =
       await fileToDataUrl(file);
 
-
     const certificate = {
-
-      id:
-        createId(),
-
+      id: createId(),
       name,
-
       organization,
 
       date:
         $("#certificateDate")
-          ?.value ||
-        "",
+          ?.value || "",
 
       link,
-
-      type:
-        file.type,
-
+      type: file.type,
       data
-
     };
-
 
     await saveCertificate(
       certificate
     );
-
 
     event.target.reset();
 
@@ -1858,17 +1383,12 @@ async function addCertificate(event) {
       "certificateModal"
     );
 
-
     await renderCertificates();
-
 
     showToast(
       "Certificate added successfully."
     );
-
-
   } catch (error) {
-
     console.error(
       "Certificate error:",
       error
@@ -1877,44 +1397,28 @@ async function addCertificate(event) {
     showToast(
       "Could not save certificate."
     );
-
   }
-
 }
 
 
-/* Preview certificate */
-
-async function previewCertificate(
-  id
-) {
-
+async function previewCertificate(id) {
   try {
-
     const certificates =
       await getCertificates();
 
-
     const certificate =
       certificates.find(
-        item =>
-          item.id === id
+        item => item.id === id
       );
 
-
-    if (!certificate) {
-      return;
-    }
-
+    if (!certificate) return;
 
     const isImage =
       (certificate.type || "")
         .startsWith("image/");
 
-
     const content =
       isImage
-
         ? `
           <img
             src="${escapeAttribute(
@@ -1925,7 +1429,6 @@ async function previewCertificate(
             )}"
           >
         `
-
         : `
           <iframe
             src="${escapeAttribute(
@@ -1937,18 +1440,12 @@ async function previewCertificate(
           ></iframe>
         `;
 
-
     const previewContent =
       $("#previewContent");
 
-
-    if (!previewContent) {
-      return;
-    }
-
+    if (!previewContent) return;
 
     previewContent.innerHTML = `
-
       ${content}
 
       <div class="preview-details">
@@ -1960,7 +1457,6 @@ async function previewCertificate(
         </h3>
 
         <p>
-
           ${escapeHtml(
             certificate.organization
           )}
@@ -1973,45 +1469,33 @@ async function previewCertificate(
                 )
               : ""
           }
-
         </p>
 
       </div>
-
     `;
-
 
     const modal =
       $("#previewModal");
 
-
     if (
       modal &&
       typeof modal.showModal ===
-      "function"
+        "function"
     ) {
-
       modal.showModal();
-
     } else if (modal) {
-
       modal.setAttribute(
         "open",
         ""
       );
-
     }
-
   } catch (error) {
-
     console.error(error);
 
     showToast(
       "Could not preview certificate."
     );
-
   }
-
 }
 
 
@@ -2022,32 +1506,39 @@ async function previewCertificate(
 async function initializeGithub() {
 
   const username =
-    String(
-      portfolioData.github || ""
-    ).trim();
+    String(portfolioData.github || "").trim();
 
+  const githubName =
+    $("#githubName");
+
+  const githubBio =
+    $("#githubBio");
+
+  const githubProfileLink =
+    $("#githubProfileLink");
+
+
+  /* No username added */
 
   if (
     !username ||
     username.includes("YOUR_")
   ) {
 
-    const status =
-      $("#githubStatus");
-
-    if (status) {
-      status.textContent =
-        "Add your username in script.js";
+    if (githubName) {
+      githubName.textContent = "GitHub";
     }
 
+    if (githubBio) {
+      githubBio.textContent =
+        "Add your GitHub username in script.js";
+    }
 
-    const profileLink =
-      $("#githubProfileLink");
+    if (githubProfileLink) {
 
+      githubProfileLink.href = "#";
 
-    if (profileLink) {
-
-      profileLink.addEventListener(
+      githubProfileLink.addEventListener(
         "click",
         event => {
 
@@ -2062,19 +1553,18 @@ async function initializeGithub() {
 
     }
 
-
     return;
-
   }
 
 
-  const status =
-    $("#githubStatus");
+  /* GitHub profile URL */
+
+  const githubUrl =
+    `https://github.com/${encodeURIComponent(username)}`;
 
 
-  if (status) {
-    status.textContent =
-      "Loading public data…";
+  if (githubProfileLink) {
+    githubProfileLink.href = githubUrl;
   }
 
 
@@ -2088,205 +1578,36 @@ async function initializeGithub() {
       );
 
 
-    const githubName =
-      $("#githubName");
-
-    const githubBio =
-      $("#githubBio");
-
-    const followers =
-      $("#followers");
-
-    const following =
-      $("#following");
-
-    const repos =
-      $("#repos");
-
+    /* Name */
 
     if (githubName) {
+
       githubName.textContent =
         user.name ||
         `@${user.login}`;
+
     }
 
+
+    /* Bio */
 
     if (githubBio) {
+
       githubBio.textContent =
         user.bio ||
-        "No public bio added.";
-    }
-
-
-    if (followers) {
-      followers.textContent =
-        user.followers ?? 0;
-    }
-
-
-    if (following) {
-      following.textContent =
-        user.following ?? 0;
-    }
-
-
-    if (repos) {
-      repos.textContent =
-        user.public_repos ?? 0;
-    }
-
-
-    const avatar =
-      $("#githubAvatar");
-
-
-    if (
-      avatar &&
-      user.avatar_url
-    ) {
-
-      avatar.innerHTML = `
-        <img
-          src="${safeUrl(
-            user.avatar_url
-          )}"
-          alt="GitHub profile picture"
-          loading="lazy"
-        >
-      `;
+        "Computer Science Engineering Student | Developer";
 
     }
 
 
-    const profileLink =
-      $("#githubProfileLink");
+    /* Profile link */
 
+    if (githubProfileLink) {
 
-    if (profileLink) {
-
-      profileLink.href =
+      githubProfileLink.href =
         safeUrl(
           user.html_url
         );
-
-    }
-
-
-    const repositories =
-      await fetchJson(
-        `https://api.github.com/users/${encodeURIComponent(
-          username
-        )}/repos?sort=updated&per_page=6`
-      );
-
-
-    const repoGrid =
-      $("#repoGrid");
-
-
-    if (!repoGrid) {
-      return;
-    }
-
-
-    if (!repositories.length) {
-
-      repoGrid.innerHTML = `
-        <div class="empty-state">
-
-          <div class="empty-state-icon">
-            ◇
-          </div>
-
-          <h3>
-            No public repositories
-          </h3>
-
-          <p>
-            Public repositories will appear here.
-          </p>
-
-        </div>
-      `;
-
-    } else {
-
-      repoGrid.innerHTML =
-        repositories
-          .map(
-            repository => `
-
-              <a
-                class="repo-card"
-                href="${safeUrl(
-                  repository.html_url
-                )}"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open ${escapeHtml(
-                  repository.name
-                )} on GitHub"
-              >
-
-                <div class="repo-card-top">
-
-                  <span class="repo-icon">
-                    GH
-                  </span>
-
-                  <span class="repo-arrow">
-                    ↗
-                  </span>
-
-                </div>
-
-                <h4>
-                  ${escapeHtml(
-                    repository.name
-                  )}
-                </h4>
-
-                <p>
-                  ${escapeHtml(
-                    repository.description ||
-                    "No description added."
-                  )}
-                </p>
-
-                <div class="repo-meta">
-
-                  <span>
-                    ${escapeHtml(
-                      repository.language ||
-                      "Code"
-                    )}
-                  </span>
-
-                  <span>
-                    ★
-                    ${repository.stargazers_count ?? 0}
-                  </span>
-
-                  <span>
-                    ⑂
-                    ${repository.forks_count ?? 0}
-                  </span>
-
-                </div>
-
-              </a>
-
-            `
-          )
-          .join("");
-
-    }
-
-
-    if (status) {
-
-      status.textContent =
-        "Live public GitHub data";
 
     }
 
@@ -2299,153 +1620,83 @@ async function initializeGithub() {
     );
 
 
-    if (status) {
+    if (githubName) {
+      githubName.textContent =
+        `@${username}`;
+    }
 
-      status.textContent =
-        "GitHub data unavailable";
+
+    if (githubBio) {
+
+      githubBio.textContent =
+        "Explore my projects and repositories on GitHub.";
 
     }
 
 
-    const repoGrid =
-      $("#repoGrid");
-
-
-    if (repoGrid) {
-
-      repoGrid.innerHTML = `
-        <div class="empty-state">
-
-          <div class="empty-state-icon">
-            ↯
-          </div>
-
-          <h3>
-            Could not load GitHub
-          </h3>
-
-          <p>
-            Check your username, internet connection
-            or GitHub API availability.
-          </p>
-
-        </div>
-      `;
-
+    if (githubProfileLink) {
+      githubProfileLink.href =
+        githubUrl;
     }
 
   }
 
 }
-
-
-/* GitHub request */
-
-async function fetchJson(
-  url
-) {
-
-  const response =
-    await fetch(
-      url,
-      {
-        headers: {
-          Accept:
-            "application/vnd.github+json"
-        }
-      }
-    );
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      `HTTP ${response.status}`
-    );
-
-  }
-
-
-  return response.json();
-
-}
-
-
 /* =========================================================
    CONTACT
 ========================================================= */
 
 function initializeContact() {
-
   const form =
     $("#contactForm");
 
-
-  if (!form) {
-    return;
-  }
-
+  if (!form) return;
 
   form.addEventListener(
     "submit",
     event => {
-
       event.preventDefault();
-
 
       const name =
         $("#contactName")
-          ?.value
-          .trim();
-
+          ?.value.trim();
 
       const email =
         $("#contactEmail")
-          ?.value
-          .trim();
-
+          ?.value.trim();
 
       const message =
         $("#contactMessage")
-          ?.value
-          .trim();
-
+          ?.value.trim();
 
       if (
         !name ||
         !email ||
         !message
       ) {
-
         showToast(
           "Please complete all fields."
         );
 
         return;
-
       }
-
 
       const subject =
         encodeURIComponent(
           `Portfolio contact from ${name}`
         );
 
-
       const body =
         encodeURIComponent(
           `Name: ${name}\nEmail: ${email}\n\n${message}`
         );
 
-
       window.location.href =
         `mailto:${portfolioData.email}` +
         `?subject=${subject}` +
         `&body=${body}`;
-
     }
   );
-
 }
 
 
@@ -2454,22 +1705,17 @@ function initializeContact() {
 ========================================================= */
 
 function initializeModals() {
-
-  $$("[data-close]")
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () =>
-            closeModal(
-              button.dataset.close
-            )
-        );
-
-      }
-    );
-
+  $$("[data-close]").forEach(
+    button => {
+      button.addEventListener(
+        "click",
+        () =>
+          closeModal(
+            button.dataset.close
+          )
+      );
+    }
+  );
 
   [
     $("#skillModal"),
@@ -2477,43 +1723,27 @@ function initializeModals() {
     $("#previewModal")
   ]
     .filter(Boolean)
-    .forEach(
-      dialog => {
-
-        dialog.addEventListener(
-          "click",
-          event => {
-
-            if (
-              event.target === dialog
-            ) {
-
-              closeModal(
-                dialog.id
-              );
-
-            }
-
+    .forEach(dialog => {
+      dialog.addEventListener(
+        "click",
+        event => {
+          if (
+            event.target === dialog
+          ) {
+            closeModal(dialog.id);
           }
-        );
+        }
+      );
 
+      dialog.addEventListener(
+        "cancel",
+        event => {
+          event.preventDefault();
 
-        dialog.addEventListener(
-          "cancel",
-          event => {
-
-            event.preventDefault();
-
-            closeModal(
-              dialog.id
-            );
-
-          }
-        );
-
-      }
-    );
-
+          closeModal(dialog.id);
+        }
+      );
+    });
 }
 
 
@@ -2522,25 +1752,18 @@ function initializeModals() {
 ========================================================= */
 
 function initializeProjectButtons() {
-
-  $$(".project-placeholder")
-    .forEach(
-      button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            showToast(
-              "Add your real GitHub or live project link to this project."
-            );
-
-          }
-        );
-
-      }
-    );
-
+  $$(".project-placeholder").forEach(
+    button => {
+      button.addEventListener(
+        "click",
+        () => {
+          showToast(
+            "Add your real GitHub or live project link to this project."
+          );
+        }
+      );
+    }
+  );
 }
 
 
@@ -2549,47 +1772,34 @@ function initializeProjectButtons() {
 ========================================================= */
 
 function closeModal(id) {
-
   const dialog =
     document.getElementById(id);
 
-
-  if (!dialog) {
-    return;
-  }
-
+  if (!dialog) return;
 
   if (
     typeof dialog.close ===
-    "function" &&
+      "function" &&
     dialog.open
   ) {
-
     dialog.close();
-
   } else {
-
     dialog.removeAttribute(
       "open"
     );
-
   }
-
 }
 
 
-/* File reader */
+/* =========================================================
+   FILE READER
+========================================================= */
 
-function fileToDataUrl(
-  file
-) {
-
+function fileToDataUrl(file) {
   return new Promise(
     (resolve, reject) => {
-
       const reader =
         new FileReader();
-
 
       reader.onload =
         () =>
@@ -2597,49 +1807,38 @@ function fileToDataUrl(
             reader.result
           );
 
-
       reader.onerror =
         () =>
           reject(
             reader.error ||
-            new Error(
-              "File could not be read."
-            )
+              new Error(
+                "File could not be read."
+              )
           );
 
-
-      reader.readAsDataURL(
-        file
-      );
-
+      reader.readAsDataURL(file);
     }
   );
-
 }
 
 
-/* Date */
+/* =========================================================
+   DATE
+========================================================= */
 
-function formatDate(
-  value
-) {
-
+function formatDate(value) {
   const date =
     new Date(
       `${value}T00:00:00`
     );
-
 
   if (
     Number.isNaN(
       date.getTime()
     )
   ) {
-
     return value;
-
   }
-
 
   return date.toLocaleDateString(
     "en-IN",
@@ -2649,104 +1848,75 @@ function formatDate(
       year: "numeric"
     }
   );
-
 }
 
 
-/* HTML escaping */
+/* =========================================================
+   HTML ESCAPING
+========================================================= */
 
-function escapeHtml(
-  value = ""
-) {
+function escapeHtml(value = "") {
+  return String(value).replace(
+    /[&<>"']/g,
+    character => {
+      const entities = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      };
 
-  return String(value)
-    .replace(
-      /[&<>"']/g,
-      character => {
-
-        const entities = {
-
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;"
-
-        };
-
-
-        return entities[
-          character
-        ];
-
-      }
-    );
-
-}
-
-
-/* Attribute escaping */
-
-function escapeAttribute(
-  value = ""
-) {
-
-  return escapeHtml(
-    value
+      return entities[character];
+    }
   );
-
 }
 
 
-/* Safe URL */
+/* =========================================================
+   ATTRIBUTE ESCAPING
+========================================================= */
 
-function safeUrl(
-  value
-) {
+function escapeAttribute(value = "") {
+  return escapeHtml(value);
+}
 
+
+/* =========================================================
+   SAFE URL
+========================================================= */
+
+function safeUrl(value) {
   try {
-
     const url =
-      new URL(
-        value
-      );
-
+      new URL(value);
 
     if (
       url.protocol === "http:" ||
       url.protocol === "https:"
     ) {
-
       return url.href;
-
     }
 
-
     return "#";
-
   } catch {
-
     return "#";
-
   }
-
 }
 
 
-/* Generate ID */
+/* =========================================================
+   GENERATE ID
+========================================================= */
 
 function createId() {
-
   if (
     typeof crypto !== "undefined" &&
     typeof crypto.randomUUID ===
-    "function"
+      "function"
   ) {
-
     return crypto.randomUUID();
-
   }
-
 
   return (
     "id-" +
@@ -2756,38 +1926,26 @@ function createId() {
       .toString(36)
       .slice(2)
   );
-
 }
 
 
-/* Toast */
+/* =========================================================
+   TOAST
+========================================================= */
 
-function showToast(
-  message
-) {
-
+function showToast(message) {
   const toast =
     $("#toast");
 
+  if (!toast) return;
 
-  if (!toast) {
-    return;
-  }
+  toast.textContent = message;
 
-
-  toast.textContent =
-    message;
-
-
-  toast.classList.add(
-    "show"
-  );
-
+  toast.classList.add("show");
 
   clearTimeout(
     window.portfolioToastTimeout
   );
-
 
   window.portfolioToastTimeout =
     setTimeout(
@@ -2797,6 +1955,4 @@ function showToast(
         ),
       2800
     );
-
 }
-
