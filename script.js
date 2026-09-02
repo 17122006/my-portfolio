@@ -13,7 +13,7 @@ const portfolioData = {
   // IMPORTANT:
   // Put ONLY your GitHub username here.
   // Example: "thrishna123"
-  github: "YOUR_GITHUB_USERNAME",
+  github: "",
 
   // Put your complete LinkedIn profile URL here.
   linkedin: "https://www.linkedin.com/in/thrishna-poojary/",
@@ -1536,7 +1536,7 @@ async function initializeGithub() {
 
     if (githubProfileLink) {
 
-      githubProfileLink.href = "#";
+      githubProfileLink.href = "https://github.com/17122006";
 
       githubProfileLink.addEventListener(
         "click",

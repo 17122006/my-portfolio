@@ -519,27 +519,29 @@
 
       <div class="container">
 
-        <div class="section-header split-header reveal">
+        <div class="section-header reveal">
 
-          <div>
-            <span class="section-label">04 / CERTIFICATES</span>
+          <span class="section-label">04 / CERTIFICATES</span>
 
-            <h2>
-              Proof of
-              <span>learning.</span>
-            </h2>
-          </div>
+          <h2>
+            Proof of
+            <span>learning.</span>
+          </h2>
 
-          <button
-            class="button button-primary small"
-            id="addCertificateButton"
-            type="button"
-          >
-            + Add certificate
-          </button>
+          <p>
+            Certificates and achievements earned through my learning journey.
+            Visitors can view and verify my certificates, but cannot add,
+            edit or delete them.
+          </p>
 
         </div>
 
+        <!--
+          PUBLIC / VIEW-ONLY CERTIFICATES
+
+          Certificate information is controlled from script.js.
+          There is intentionally NO "Add certificate" button here.
+        -->
         <div class="certificate-grid" id="certificateGrid"></div>
 
       </div>
@@ -971,136 +973,6 @@
           class="button button-primary"
         >
           Save skill
-        </button>
-
-      </div>
-
-    </form>
-
-  </dialog>
-
-
-  <!-- CERTIFICATE MODAL -->
-  <dialog
-    class="modal"
-    id="certificateModal"
-    aria-labelledby="certificateModalTitle"
-  >
-
-    <form class="modal-card" id="certificateForm">
-
-      <button
-        type="button"
-        class="modal-close"
-        data-close="certificateModal"
-        aria-label="Close dialog"
-      >
-        ×
-      </button>
-
-      <span class="section-label">
-        CERTIFICATE MANAGER
-      </span>
-
-      <h2 id="certificateModalTitle">
-        Add a certificate
-      </h2>
-
-      <div class="form-group">
-
-        <label for="certificateName">
-          Certificate name
-        </label>
-
-        <input
-          type="text"
-          id="certificateName"
-          placeholder="Python Fundamentals"
-          required
-        >
-
-      </div>
-
-      <div class="form-group">
-
-        <label for="certificateOrganization">
-          Issuing organization
-        </label>
-
-        <input
-          type="text"
-          id="certificateOrganization"
-          placeholder="Coursera"
-          required
-        >
-
-      </div>
-
-      <div class="form-group">
-
-        <label for="certificateDate">Date</label>
-
-        <input
-          type="date"
-          id="certificateDate"
-        >
-
-      </div>
-
-      <div class="form-group">
-
-        <label for="certificateFile">
-          Certificate image / PDF
-        </label>
-
-        <input
-          type="file"
-          id="certificateFile"
-          accept="image/*,.pdf,application/pdf"
-          required
-        >
-
-        <small>
-          JPG, PNG, WEBP or PDF • Maximum 8 MB
-        </small>
-
-      </div>
-
-      <div class="form-group">
-
-        <label for="certificateLink">
-          Certificate link
-          <span class="optional">optional</span>
-        </label>
-
-        <input
-          type="url"
-          id="certificateLink"
-          placeholder="https://..."
-        >
-
-      </div>
-
-      <div class="modal-note">
-        Certificates are stored locally in this browser.
-        They are not uploaded to a server.
-      </div>
-
-      <div class="modal-actions">
-
-        <button
-          type="button"
-          class="button button-secondary"
-          data-close="certificateModal"
-        >
-          Cancel
-        </button>
-
-        <button
-          type="submit"
-          class="button button-primary"
-        >
-          Add certificate
         </button>
 
       </div>
