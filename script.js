@@ -16,7 +16,7 @@ const portfolioData = {
   github: "YOUR_GITHUB_USERNAME",
 
   // Put your complete LinkedIn profile URL here.
-  linkedin: "https://www.linkedin.com/in/YOUR_USERNAME/",
+  linkedin: "https://www.linkedin.com/in/thrishna-poojary/",
 
   bio:
     "I am a Computer Science Engineering student passionate about technology, software development and building practical digital solutions.",
