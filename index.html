@@ -513,41 +513,72 @@
 
     </section>
 
+<!-- CERTIFICATES -->
+<section class="section" id="certificates">
 
-    <!-- CERTIFICATES -->
-    <section class="section" id="certificates">
+  <div class="container">
 
-      <div class="container">
+    <div class="section-header reveal">
 
-        <div class="section-header reveal">
+      <span class="section-label">
+        04 / CERTIFICATES
+      </span>
 
-          <span class="section-label">04 / CERTIFICATES</span>
+      <h2>
+        Proof of
+        <span>learning.</span>
+      </h2>
 
-          <h2>
-            Proof of
-            <span>learning.</span>
-          </h2>
+      <p>
+        Certificates and achievements earned
+        through my learning journey.
+        Visitors can view and verify my certificates.
+      </p>
 
-          <p>
-            Certificates and achievements earned through my learning journey.
-            Visitors can view and verify my certificates, but cannot add,
-            edit or delete them.
-          </p>
+    </div>
 
-        </div>
 
-        <!--
-          PUBLIC / VIEW-ONLY CERTIFICATES
+    <!-- OWNER CONTROLS -->
 
-          Certificate information is controlled from script.js.
-          There is intentionally NO "Add certificate" button here.
-        -->
-        <div class="certificate-grid" id="certificateGrid"></div>
+    <div class="certificate-owner-controls">
 
-      </div>
+      <button
+        type="button"
+        class="button button-primary small"
+        id="loginOwnerButton"
+      >
+        Owner Login
+      </button>
 
-    </section>
+      <button
+        type="button"
+        class="button button-primary small"
+        id="addCertificateButton"
+        style="display: none;"
+      >
+        + Add Certificate
+      </button>
 
+      <button
+        type="button"
+        class="button button-secondary small"
+        id="logoutOwnerButton"
+        style="display: none;"
+      >
+        Logout
+      </button>
+
+    </div>
+
+
+    <div
+      class="certificate-grid"
+      id="certificateGrid"
+    ></div>
+
+  </div>
+
+</section>
 
   <!-- GITHUB -->
 <section class="section" id="github">
@@ -981,6 +1012,250 @@
 
   </dialog>
 
+<!-- ADD CERTIFICATE MODAL -->
+
+<dialog
+  class="modal"
+  id="certificateModal"
+  aria-labelledby="certificateModalTitle"
+>
+
+  <div class="modal-card">
+
+    <button
+      type="button"
+      class="modal-close"
+      data-close="certificateModal"
+      aria-label="Close"
+    >
+      ×
+    </button>
+
+
+    <div class="modal-header">
+
+      <span class="section-label">
+        CERTIFICATE
+      </span>
+
+      <h2 id="certificateModalTitle">
+        Add a certificate
+      </h2>
+
+      <p>
+        Add a certificate to your portfolio.
+      </p>
+
+    </div>
+
+
+    <form id="certificateForm">
+
+      <div class="form-group">
+
+        <label for="certificateName">
+          Certificate name
+        </label>
+
+        <input
+          type="text"
+          id="certificateName"
+          placeholder="Python Programming Certificate"
+          maxlength="100"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="certificateOrganization">
+          Issued by
+        </label>
+
+        <input
+          type="text"
+          id="certificateOrganization"
+          placeholder="Coursera"
+          maxlength="100"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="certificateDate">
+          Date
+          <span class="optional">optional</span>
+        </label>
+
+        <input
+          type="date"
+          id="certificateDate"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="certificateLink">
+          Verification link
+          <span class="optional">optional</span>
+        </label>
+
+        <input
+          type="url"
+          id="certificateLink"
+          placeholder="https://..."
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="certificateFile">
+          Certificate file
+        </label>
+
+        <input
+          type="file"
+          id="certificateFile"
+          accept="image/*,.pdf"
+          required
+        >
+
+        <small>
+          JPG, PNG, WEBP or PDF. Maximum 8 MB.
+        </small>
+
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="button button-secondary"
+          data-close="certificateModal"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="button button-primary"
+        >
+          Add certificate
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</dialog>
+
+<!-- OWNER LOGIN MODAL -->
+
+<dialog
+  class="modal"
+  id="ownerLoginModal"
+  aria-labelledby="ownerLoginTitle"
+>
+
+  <div class="modal-card">
+
+    <button
+      type="button"
+      class="modal-close"
+      data-close="ownerLoginModal"
+      aria-label="Close"
+    >
+      ×
+    </button>
+
+
+    <div class="modal-header">
+
+      <span class="section-label">
+        OWNER
+      </span>
+
+      <h2 id="ownerLoginTitle">
+        Owner Login
+      </h2>
+
+      <p>
+        Sign in to manage your certificates.
+      </p>
+
+    </div>
+
+
+    <form id="ownerLoginForm">
+
+      <div class="form-group">
+
+        <label for="ownerEmail">
+          Email
+        </label>
+
+        <input
+          type="email"
+          id="ownerEmail"
+          placeholder="Your Firebase email"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="ownerPassword">
+          Password
+        </label>
+
+        <input
+          type="password"
+          id="ownerPassword"
+          placeholder="Your password"
+          required
+        >
+
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="button button-secondary"
+          data-close="ownerLoginModal"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="button button-primary"
+        >
+          Login
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</dialog>
 
   <!-- CERTIFICATE PREVIEW -->
   <dialog
@@ -1016,7 +1291,7 @@
   ></div>
 
 
-  <script src="./script.js"></script>
+<script type="module" src="./script.js"></script>
 
 </body>
 </html>

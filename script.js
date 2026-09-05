@@ -1,3 +1,20 @@
+import { auth, db } from "./firebase.js";
+
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 /* =========================================================
    PERSONAL INFORMATION
    EDIT ONLY THIS SECTION
@@ -130,18 +147,27 @@ let currentSkillCategory = "All";
 document.addEventListener("DOMContentLoaded", initializeApp);
 
 async function initializeApp() {
+
   initializePersonalData();
+
   initializeLoader();
+
   initializeNavigation();
+
   initializeScrollAnimations();
+
   initializeSkills();
 
-  await initializeCertificates();
+  initializeCertificates();
+
   await initializeGithub();
 
   initializeContact();
+
   initializeModals();
+
   initializeProjectButtons();
+
 }
 
 
@@ -803,237 +829,734 @@ function saveSkills() {
 
 /* =========================================================
    CERTIFICATES
-   INDEXEDDB
+   FIREBASE FIRESTORE ONLY
+   NO FIREBASE STORAGE
 ========================================================= */
 
-const DATABASE_NAME =
-  "PremiumPortfolioDatabase";
-
-const DATABASE_VERSION = 1;
-
-const CERTIFICATE_STORE =
-  "certificates";
-
-let databasePromise = null;
+let currentUser = null;
 
 
-function openDatabase() {
-  if (databasePromise) {
-    return databasePromise;
-  }
+/* ---------------------------------------------------------
+   YOUR FIREBASE OWNER UID
+--------------------------------------------------------- */
 
-  databasePromise =
-    new Promise(
-      (resolve, reject) => {
-        if (!("indexedDB" in window)) {
-          reject(
-            new Error(
-              "IndexedDB is not supported."
-            )
-          );
-
-          return;
-        }
-
-        const request =
-          indexedDB.open(
-            DATABASE_NAME,
-            DATABASE_VERSION
-          );
-
-        request.onupgradeneeded =
-          event => {
-            const database =
-              event.target.result;
-
-            if (
-              !database.objectStoreNames.contains(
-                CERTIFICATE_STORE
-              )
-            ) {
-              database.createObjectStore(
-                CERTIFICATE_STORE,
-                {
-                  keyPath: "id"
-                }
-              );
-            }
-          };
-
-        request.onsuccess =
-          () =>
-            resolve(request.result);
-
-        request.onerror =
-          () =>
-            reject(
-              request.error ||
-                new Error(
-                  "Could not open database."
-                )
-            );
-      }
-    );
-
-  return databasePromise;
-}
+const OWNER_UID =
+  "E9U9mGfxm9N4R73g4f0qgHevKIE2";
 
 
-async function getCertificates() {
-  const database =
-    await openDatabase();
+/*
+   Firestore documents have a size limit of about 1 MiB.
 
-  return new Promise(
-    (resolve, reject) => {
-      const transaction =
-        database.transaction(
-          CERTIFICATE_STORE,
-          "readonly"
-        );
+   Because images are converted to Base64 before saving,
+   keep certificate files below 500 KB.
 
-      const request =
-        transaction
-          .objectStore(
-            CERTIFICATE_STORE
-          )
-          .getAll();
+   JPG/PNG certificates work best.
+*/
 
-      request.onsuccess =
-        () =>
-          resolve(
-            request.result || []
-          );
-
-      request.onerror =
-        () =>
-          reject(
-            request.error
-          );
-    }
-  );
-}
+const MAX_CERTIFICATE_SIZE =
+  500 * 1024;
 
 
-async function saveCertificate(
-  certificate
-) {
-  const database =
-    await openDatabase();
+/* =========================================================
+   UPDATE OWNER UI
+========================================================= */
 
-  return new Promise(
-    (resolve, reject) => {
-      const transaction =
-        database.transaction(
-          CERTIFICATE_STORE,
-          "readwrite"
-        );
+function updateOwnerUI(user) {
 
-      const request =
-        transaction
-          .objectStore(
-            CERTIFICATE_STORE
-          )
-          .put(certificate);
-
-      request.onsuccess =
-        () => resolve();
-
-      request.onerror =
-        () =>
-          reject(
-            request.error
-          );
-    }
-  );
-}
+  currentUser = user;
 
 
-async function deleteCertificate(id) {
-  const database =
-    await openDatabase();
+  const loginButton =
+    $("#loginOwnerButton");
 
-  return new Promise(
-    (resolve, reject) => {
-      const transaction =
-        database.transaction(
-          CERTIFICATE_STORE,
-          "readwrite"
-        );
-
-      const request =
-        transaction
-          .objectStore(
-            CERTIFICATE_STORE
-          )
-          .delete(id);
-
-      request.onsuccess =
-        () => resolve();
-
-      request.onerror =
-        () =>
-          reject(
-            request.error
-          );
-    }
-  );
-}
-
-
-async function initializeCertificates() {
   const addButton =
     $("#addCertificateButton");
 
-  const form =
-    $("#certificateForm");
+  const logoutButton =
+    $("#logoutOwnerButton");
+
+
+  const isOwner =
+    user &&
+    user.uid === OWNER_UID;
+
+
+  /* LOGIN BUTTON */
+
+  if (loginButton) {
+
+    loginButton.style.display =
+      isOwner
+        ? "none"
+        : "inline-flex";
+
+  }
+
+
+  /* ADD CERTIFICATE BUTTON */
 
   if (addButton) {
+
+    addButton.style.display =
+      isOwner
+        ? "inline-flex"
+        : "none";
+
+  }
+
+
+  /* LOGOUT BUTTON */
+
+  if (logoutButton) {
+
+    logoutButton.style.display =
+      isOwner
+        ? "inline-flex"
+        : "none";
+
+  }
+
+
+  /*
+     Re-render certificates so that
+     delete buttons appear/disappear
+     when owner logs in/out.
+  */
+
+  renderCertificates();
+
+}
+
+
+/* =========================================================
+   INITIALIZE CERTIFICATES
+========================================================= */
+
+function initializeCertificates() {
+
+  const loginButton =
+    $("#loginOwnerButton");
+
+  const addButton =
+    $("#addCertificateButton");
+
+  const logoutButton =
+    $("#logoutOwnerButton");
+
+  const loginForm =
+    $("#ownerLoginForm");
+
+  const certificateForm =
+    $("#certificateForm");
+
+
+  /* -------------------------------------------------------
+     OWNER LOGIN BUTTON
+  ------------------------------------------------------- */
+
+  if (loginButton) {
+
+    loginButton.addEventListener(
+      "click",
+      () => {
+
+        const modal =
+          $("#ownerLoginModal");
+
+        if (!modal) return;
+
+        modal.showModal();
+
+      }
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     ADD CERTIFICATE BUTTON
+  ------------------------------------------------------- */
+
+  if (addButton) {
+
     addButton.addEventListener(
       "click",
       () => {
+
+        /*
+           Extra security check.
+        */
+
+        if (
+          !currentUser ||
+          currentUser.uid !== OWNER_UID
+        ) {
+
+          showToast(
+            "Please login as owner first."
+          );
+
+          return;
+
+        }
+
+
         const modal =
           $("#certificateModal");
 
         if (!modal) return;
 
-        if (
-          typeof modal.showModal ===
-          "function"
-        ) {
-          modal.showModal();
-        } else {
-          modal.setAttribute(
-            "open",
-            ""
-          );
-        }
+        modal.showModal();
+
       }
     );
+
   }
 
-  if (form) {
-    form.addEventListener(
+
+  /* -------------------------------------------------------
+     LOGOUT BUTTON
+  ------------------------------------------------------- */
+
+  if (logoutButton) {
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+
+        try {
+
+          await signOut(auth);
+
+          showToast(
+            "Logged out successfully."
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Logout error:",
+            error
+          );
+
+          showToast(
+            "Could not logout."
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     LOGIN FORM
+  ------------------------------------------------------- */
+
+  if (loginForm) {
+
+    loginForm.addEventListener(
+      "submit",
+      ownerLogin
+    );
+
+  }
+
+
+  /* -------------------------------------------------------
+     CERTIFICATE FORM
+  ------------------------------------------------------- */
+
+  if (certificateForm) {
+
+    certificateForm.addEventListener(
       "submit",
       addCertificate
     );
+
   }
 
-  await renderCertificates();
+
+  /* -------------------------------------------------------
+     FIREBASE AUTH STATE
+  ------------------------------------------------------- */
+
+  onAuthStateChanged(
+    auth,
+    user => {
+
+      currentUser = user;
+
+      updateOwnerUI(user);
+
+    }
+  );
+
+
+  /* -------------------------------------------------------
+     LOAD CERTIFICATES
+  ------------------------------------------------------- */
+
+  renderCertificates();
+
 }
 
 
+/* =========================================================
+   OWNER LOGIN
+========================================================= */
+
+async function ownerLogin(event) {
+
+  event.preventDefault();
+
+
+  const email =
+    $("#ownerEmail")
+      ?.value
+      .trim();
+
+
+  const password =
+    $("#ownerPassword")
+      ?.value;
+
+
+  if (!email || !password) {
+
+    showToast(
+      "Please enter email and password."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    const result =
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+
+    /*
+       Make sure the logged-in account
+       is your owner account.
+    */
+
+    if (
+      result.user.uid !== OWNER_UID
+    ) {
+
+      await signOut(auth);
+
+      showToast(
+        "This account is not the portfolio owner."
+      );
+
+      return;
+
+    }
+
+
+    event.target.reset();
+
+
+    closeModal(
+      "ownerLoginModal"
+    );
+
+
+    showToast(
+      "Owner login successful."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Login error:",
+      error
+    );
+
+
+    showToast(
+      "Login failed. Check your email and password."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CONVERT FILE TO DATA URL
+========================================================= */
+
+function fileToDataURL(file) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload = () => {
+
+        resolve(
+          reader.result
+        );
+
+      };
+
+
+      reader.onerror = () => {
+
+        reject(
+          new Error(
+            "Could not read certificate file."
+          )
+        );
+
+      };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   GET CERTIFICATES
+========================================================= */
+
+async function getCertificates() {
+
+  const certificatesRef =
+    collection(
+      db,
+      "certificates"
+    );
+
+
+  const snapshot =
+    await getDocs(
+      certificatesRef
+    );
+
+
+  const certificates =
+    snapshot.docs.map(
+      certificateDoc => ({
+
+        id:
+          certificateDoc.id,
+
+        ...certificateDoc.data()
+
+      })
+    );
+
+
+  /*
+     Sort newest certificates first.
+     This avoids needing Firestore orderBy()
+     and also works with older documents.
+  */
+
+  certificates.sort(
+    (a, b) => {
+
+      const dateA =
+        a.createdAt?.seconds || 0;
+
+      const dateB =
+        b.createdAt?.seconds || 0;
+
+      return dateB - dateA;
+
+    }
+  );
+
+
+  return certificates;
+
+}
+
+
+/* =========================================================
+   ADD CERTIFICATE
+========================================================= */
+
+async function addCertificate(event) {
+
+  event.preventDefault();
+
+
+  /* -------------------------------------------------------
+     OWNER SECURITY CHECK
+  ------------------------------------------------------- */
+
+  if (
+    !currentUser ||
+    currentUser.uid !== OWNER_UID
+  ) {
+
+    showToast(
+      "Only the portfolio owner can add certificates."
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------------
+     GET FILE
+  ------------------------------------------------------- */
+
+  const fileInput =
+    $("#certificateFile");
+
+
+  const file =
+    fileInput?.files?.[0];
+
+
+  if (!file) {
+
+    showToast(
+      "Please select a certificate."
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------------
+     FILE SIZE CHECK
+  ------------------------------------------------------- */
+
+  if (
+    file.size > MAX_CERTIFICATE_SIZE
+  ) {
+
+    showToast(
+      "Certificate must be smaller than 500 KB."
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------------
+     FILE TYPE CHECK
+  ------------------------------------------------------- */
+
+  const validFile =
+    file.type.startsWith("image/") ||
+    file.type === "application/pdf";
+
+
+  if (!validFile) {
+
+    showToast(
+      "Please select a JPG, PNG or PDF certificate."
+    );
+
+    return;
+
+  }
+
+
+  /* -------------------------------------------------------
+     FORM DATA
+  ------------------------------------------------------- */
+
+  const name =
+    $("#certificateName")
+      ?.value
+      .trim();
+
+
+  const organization =
+    $("#certificateOrganization")
+      ?.value
+      .trim();
+
+
+  const date =
+    $("#certificateDate")
+      ?.value || "";
+
+
+  const link =
+    $("#certificateLink")
+      ?.value
+      .trim() || "";
+
+
+  /* -------------------------------------------------------
+     REQUIRED FIELDS
+  ------------------------------------------------------- */
+
+  if (
+    !name ||
+    !organization
+  ) {
+
+    showToast(
+      "Please fill the required fields."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    showToast(
+      "Adding certificate..."
+    );
+
+
+    /* -----------------------------------------------------
+       CONVERT CERTIFICATE FILE
+    ----------------------------------------------------- */
+
+    const fileData =
+      await fileToDataURL(file);
+
+
+    /* -----------------------------------------------------
+       SAVE EVERYTHING TO FIRESTORE
+
+       No Firebase Storage is used.
+    ----------------------------------------------------- */
+
+    await addDoc(
+      collection(
+        db,
+        "certificates"
+      ),
+      {
+
+        name:
+          name,
+
+        organization:
+          organization,
+
+        date:
+          date,
+
+        link:
+          link,
+
+        type:
+          file.type,
+
+        fileName:
+          file.name,
+
+        fileData:
+          fileData,
+
+        createdBy:
+          currentUser.uid,
+
+        createdAt:
+          serverTimestamp()
+
+      }
+    );
+
+
+    /* -----------------------------------------------------
+       RESET FORM
+    ----------------------------------------------------- */
+
+    event.target.reset();
+
+
+    /* -----------------------------------------------------
+       CLOSE MODAL
+    ----------------------------------------------------- */
+
+    closeModal(
+      "certificateModal"
+    );
+
+
+    /* -----------------------------------------------------
+       REFRESH CERTIFICATES
+    ----------------------------------------------------- */
+
+    await renderCertificates();
+
+
+    showToast(
+      "Certificate added successfully."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Certificate error:",
+      error
+    );
+
+
+    showToast(
+      "Could not add certificate."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER CERTIFICATES
+========================================================= */
+
 async function renderCertificates() {
+
   const grid =
     $("#certificateGrid");
 
+
   if (!grid) return;
 
+
   try {
+
     const certificates =
       await getCertificates();
 
+
+    /* -----------------------------------------------------
+       NO CERTIFICATES
+    ----------------------------------------------------- */
+
     if (!certificates.length) {
+
       grid.innerHTML = `
+
         <div class="empty-state">
 
           <div class="empty-state-icon">
@@ -1045,22 +1568,21 @@ async function renderCertificates() {
           </h3>
 
           <p>
-            Add your certificates using
-            the button above.
+            Certificates will appear here.
           </p>
 
         </div>
+
       `;
 
       return;
+
     }
 
-    certificates.sort(
-      (a, b) =>
-        (b.date || "").localeCompare(
-          a.date || ""
-        )
-    );
+
+    /* -----------------------------------------------------
+       CREATE CERTIFICATE CARDS
+    ----------------------------------------------------- */
 
     grid.innerHTML =
       certificates
@@ -1072,78 +1594,121 @@ async function renderCertificates() {
         )
         .join("");
 
+
+    /* -----------------------------------------------------
+       PREVIEW
+    ----------------------------------------------------- */
+
     $$("[data-preview-certificate]")
       .forEach(element => {
+
         element.addEventListener(
           "click",
-          () =>
+          () => {
+
             previewCertificate(
               element.dataset
                 .previewCertificate
-            )
+            );
+
+          }
         );
+
+
+        /*
+           Keyboard support
+        */
 
         element.addEventListener(
           "keydown",
           event => {
+
             if (
               event.key === "Enter" ||
               event.key === " "
             ) {
+
               event.preventDefault();
 
               previewCertificate(
                 element.dataset
                   .previewCertificate
               );
+
             }
+
           }
         );
+
       });
+
+
+    /* -----------------------------------------------------
+       DELETE
+    ----------------------------------------------------- */
 
     $$("[data-delete-certificate]")
       .forEach(button => {
+
         button.addEventListener(
           "click",
           async event => {
+
             event.stopPropagation();
+
+
+            /*
+               Only owner can delete.
+            */
+
+            if (
+              !currentUser ||
+              currentUser.uid !== OWNER_UID
+            ) {
+
+              showToast(
+                "Only the owner can delete certificates."
+              );
+
+              return;
+
+            }
+
 
             const id =
               button.dataset
                 .deleteCertificate;
+
 
             const confirmed =
               window.confirm(
                 "Delete this certificate?"
               );
 
+
             if (!confirmed) return;
 
-            try {
-              await deleteCertificate(id);
 
-              await renderCertificates();
+            await deleteCertificate(
+              id
+            );
 
-              showToast(
-                "Certificate deleted."
-              );
-            } catch (error) {
-              console.error(error);
-
-              showToast(
-                "Could not delete certificate."
-              );
-            }
           }
         );
+
       });
+
+
   } catch (error) {
+
     console.error(
-      "Certificate storage error:",
+      "Certificate loading error:",
       error
     );
 
+
     grid.innerHTML = `
+
       <div class="empty-state">
 
         <div class="empty-state-icon">
@@ -1151,49 +1716,140 @@ async function renderCertificates() {
         </div>
 
         <h3>
-          Certificate storage unavailable
+          Could not load certificates
         </h3>
 
         <p>
-          Your browser may have disabled IndexedDB.
+          Please try again later.
         </p>
 
       </div>
+
     `;
+
   }
+
 }
 
+
+/* =========================================================
+   CREATE CERTIFICATE CARD
+========================================================= */
 
 function createCertificateCard(
   certificate
 ) {
+
   const type =
     certificate.type || "";
+
 
   const isImage =
     type.startsWith("image/");
 
+
+  /*
+     IMAGE PREVIEW
+  */
+
   const preview =
     isImage
+
       ? `
+
         <img
           src="${escapeAttribute(
-            certificate.data
+            certificate.fileData
           )}"
           alt="${escapeHtml(
             certificate.name
           )} certificate"
           loading="lazy"
         >
+
       `
+
       : `
+
         <div class="pdf-preview">
-          PDF
+
+          <span>
+            PDF
+          </span>
+
+          <small>
+            Click to preview
+          </small>
+
         </div>
+
       `;
 
+
+  /*
+     OWNER DELETE BUTTON
+  */
+
+  const ownerControls =
+    currentUser &&
+    currentUser.uid === OWNER_UID
+
+      ? `
+
+        <button
+          type="button"
+          class="icon-button"
+          data-delete-certificate="${escapeAttribute(
+            certificate.id
+          )}"
+          title="Delete certificate"
+          aria-label="Delete certificate"
+        >
+          ×
+        </button>
+
+      `
+
+      : "";
+
+
+  /*
+     VERIFICATION LINK
+  */
+
+  const verificationLink =
+    certificate.link &&
+    safeUrl(
+      certificate.link
+    ) !== "#"
+
+      ? `
+
+        <a
+          href="${safeUrl(
+            certificate.link
+          )}"
+          class="icon-button"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Verify certificate"
+          aria-label="Verify certificate"
+        >
+          ↗
+        </a>
+
+      `
+
+      : "";
+
+
   return `
-    <article class="certificate-card">
+
+    <article
+      class="certificate-card"
+    >
+
+      <!-- CERTIFICATE IMAGE/PDF -->
 
       <div
         class="certificate-preview"
@@ -1211,6 +1867,9 @@ function createCertificateCard(
 
       </div>
 
+
+      <!-- CERTIFICATE INFORMATION -->
+
       <div class="certificate-info">
 
         <h3>
@@ -1219,15 +1878,18 @@ function createCertificateCard(
           )}
         </h3>
 
+
         <p>
           ${escapeHtml(
             certificate.organization
           )}
         </p>
 
+
         <div class="certificate-bottom">
 
           <span class="certificate-date">
+
             ${
               certificate.date
                 ? formatDate(
@@ -1235,43 +1897,15 @@ function createCertificateCard(
                   )
                 : "Date not added"
             }
+
           </span>
+
 
           <div class="certificate-actions">
 
-            ${
-              certificate.link &&
-              safeUrl(
-                certificate.link
-              ) !== "#"
-                ? `
-                  <a
-                    href="${safeUrl(
-                      certificate.link
-                    )}"
-                    class="icon-button"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Open certificate link"
-                    aria-label="Open certificate link"
-                  >
-                    ↗
-                  </a>
-                `
-                : ""
-            }
+            ${verificationLink}
 
-            <button
-              type="button"
-              class="icon-button"
-              data-delete-certificate="${escapeAttribute(
-                certificate.id
-              )}"
-              title="Delete certificate"
-              aria-label="Delete certificate"
-            >
-              ×
-            </button>
+            ${ownerControls}
 
           </div>
 
@@ -1280,183 +1914,121 @@ function createCertificateCard(
       </div>
 
     </article>
+
   `;
+
 }
 
 
-async function addCertificate(event) {
-  event.preventDefault();
-
-  const fileInput =
-    $("#certificateFile");
-
-  const file =
-    fileInput?.files?.[0];
-
-  if (!file) {
-    showToast(
-      "Please select a certificate."
-    );
-
-    return;
-  }
-
-  const maximumSize =
-    8 * 1024 * 1024;
-
-  if (file.size > maximumSize) {
-    showToast(
-      "Certificate must be smaller than 8 MB."
-    );
-
-    return;
-  }
-
-  const validFile =
-    file.type.startsWith("image/") ||
-    file.type === "application/pdf";
-
-  if (!validFile) {
-    showToast(
-      "Please select an image or PDF."
-    );
-
-    return;
-  }
-
-  const name =
-    $("#certificateName")
-      ?.value.trim();
-
-  const organization =
-    $("#certificateOrganization")
-      ?.value.trim();
-
-  if (!name || !organization) {
-    showToast(
-      "Please fill the required fields."
-    );
-
-    return;
-  }
-
-  const link =
-    $("#certificateLink")
-      ?.value.trim() || "";
-
-  if (
-    link &&
-    safeUrl(link) === "#"
-  ) {
-    showToast(
-      "Please enter a valid certificate URL."
-    );
-
-    return;
-  }
-
-  try {
-    const data =
-      await fileToDataUrl(file);
-
-    const certificate = {
-      id: createId(),
-      name,
-      organization,
-
-      date:
-        $("#certificateDate")
-          ?.value || "",
-
-      link,
-      type: file.type,
-      data
-    };
-
-    await saveCertificate(
-      certificate
-    );
-
-    event.target.reset();
-
-    closeModal(
-      "certificateModal"
-    );
-
-    await renderCertificates();
-
-    showToast(
-      "Certificate added successfully."
-    );
-  } catch (error) {
-    console.error(
-      "Certificate error:",
-      error
-    );
-
-    showToast(
-      "Could not save certificate."
-    );
-  }
-}
-
+/* =========================================================
+   PREVIEW CERTIFICATE
+========================================================= */
 
 async function previewCertificate(id) {
+
   try {
+
     const certificates =
       await getCertificates();
 
+
     const certificate =
       certificates.find(
-        item => item.id === id
+        item =>
+          item.id === id
       );
 
-    if (!certificate) return;
+
+    if (!certificate) {
+
+      showToast(
+        "Certificate not found."
+      );
+
+      return;
+
+    }
+
+
+    const previewContent =
+      $("#previewContent");
+
+
+    if (!previewContent) {
+      return;
+    }
+
+
+    const type =
+      certificate.type || "";
+
 
     const isImage =
-      (certificate.type || "")
-        .startsWith("image/");
+      type.startsWith("image/");
+
+
+    /*
+       IMAGE
+    */
 
     const content =
       isImage
+
         ? `
+
           <img
             src="${escapeAttribute(
-              certificate.data
+              certificate.fileData
             )}"
             alt="${escapeHtml(
               certificate.name
             )}"
           >
+
         `
+
+        /*
+           PDF
+        */
+
         : `
+
           <iframe
             src="${escapeAttribute(
-              certificate.data
+              certificate.fileData
             )}"
             title="${escapeHtml(
               certificate.name
             )}"
+            style="
+              width:100%;
+              min-height:70vh;
+              border:0;
+              border-radius:12px;
+            "
           ></iframe>
+
         `;
 
-    const previewContent =
-      $("#previewContent");
-
-    if (!previewContent) return;
 
     previewContent.innerHTML = `
+
       ${content}
+
 
       <div class="preview-details">
 
         <h3 id="previewTitle">
+
           ${escapeHtml(
             certificate.name
           )}
+
         </h3>
 
+
         <p>
+
           ${escapeHtml(
             certificate.organization
           )}
@@ -1469,35 +2041,121 @@ async function previewCertificate(id) {
                 )
               : ""
           }
+
         </p>
 
       </div>
+
     `;
+
 
     const modal =
       $("#previewModal");
 
-    if (
-      modal &&
-      typeof modal.showModal ===
-        "function"
-    ) {
+
+    if (modal) {
+
       modal.showModal();
-    } else if (modal) {
-      modal.setAttribute(
-        "open",
-        ""
-      );
+
     }
+
+
   } catch (error) {
-    console.error(error);
+
+    console.error(
+      "Preview error:",
+      error
+    );
+
 
     showToast(
       "Could not preview certificate."
     );
+
   }
+
 }
 
+
+/* =========================================================
+   DELETE CERTIFICATE
+========================================================= */
+
+async function deleteCertificate(
+  id
+) {
+
+  try {
+
+    /*
+       OWNER SECURITY CHECK
+    */
+
+    if (
+      !currentUser ||
+      currentUser.uid !== OWNER_UID
+    ) {
+
+      showToast(
+        "Only the owner can delete certificates."
+      );
+
+      return;
+
+    }
+
+
+    /* -----------------------------------------------------
+       FIRESTORE DOCUMENT
+    ----------------------------------------------------- */
+
+    const certificateRef =
+      doc(
+        db,
+        "certificates",
+        id
+      );
+
+
+    /* -----------------------------------------------------
+       DELETE DOCUMENT
+
+       No Storage file needs to be deleted because
+       the certificate is stored directly in Firestore.
+    ----------------------------------------------------- */
+
+    await deleteDoc(
+      certificateRef
+    );
+
+
+    /* -----------------------------------------------------
+       REFRESH
+    ----------------------------------------------------- */
+
+    await renderCertificates();
+
+
+    showToast(
+      "Certificate deleted."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Delete certificate error:",
+      error
+    );
+
+
+    showToast(
+      "Could not delete certificate."
+    );
+
+  }
+
+}
 
 /* =========================================================
    GITHUB
@@ -1522,7 +2180,7 @@ async function initializeGithub() {
 
   if (
     !username ||
-    username.includes("YOUR_")
+    username.includes("17122006")
   ) {
 
     if (githubName) {
@@ -1564,7 +2222,7 @@ async function initializeGithub() {
 
 
   if (githubProfileLink) {
-    githubProfileLink.href = githubUrl;
+    githubProfileLink.href = `https://github.com/17122206`;
   }
 
 
