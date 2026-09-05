@@ -13,10 +13,10 @@ const portfolioData = {
   // IMPORTANT:
   // Put ONLY your GitHub username here.
   // Example: "thrishna123"
-  github: "",
+  github: "17122006",
 
   // Put your complete LinkedIn profile URL here.
-  linkedin: "https://www.linkedin.com/in/thrishna-poojary/",
+  linkedin: "https://www.linkedin.com/in/thrishna-poojary-761346334/",
 
   bio:
     "I am a Computer Science Engineering student passionate about technology, software development and building practical digital solutions.",
@@ -1515,7 +1515,7 @@ async function initializeGithub() {
     $("#githubBio");
 
   const githubProfileLink =
-    $("#githubProfileLink");
+    $("`https://api.github.com/users/17122206");
 
 
   /* No username added */
@@ -1560,7 +1560,7 @@ async function initializeGithub() {
   /* GitHub profile URL */
 
   const githubUrl =
-    `https://github.com/${encodeURIComponent(username)}`;
+    `https://github.com/17122206`;
 
 
   if (githubProfileLink) {
@@ -1572,8 +1572,7 @@ async function initializeGithub() {
 
     const user =
       await fetchJson(
-        `https://api.github.com/users/${encodeURIComponent(
-          username
+        `https://api.github.com/users/17122206
         )}`
       );
 
@@ -1622,7 +1621,7 @@ async function initializeGithub() {
 
     if (githubName) {
       githubName.textContent =
-        `@${username}`;
+        `https://api.github.com/users/17122206`;
     }
 
 
